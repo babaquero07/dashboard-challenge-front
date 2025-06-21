@@ -17,7 +17,6 @@ const handleLogin = async () => {
 
   try {
     await authStore.login({ email: email.value, password: password.value });
-    alert("Login exitoso");
     router.push("/dashboard");
   } catch (error: any) {
     alert(error.message);

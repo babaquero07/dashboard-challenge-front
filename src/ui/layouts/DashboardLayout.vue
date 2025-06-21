@@ -7,7 +7,7 @@ import Navbar from "../molecules/Navbar.vue";
     <Navbar />
   </header>
 
-  <main class="w-full p-4">
+  <main class="w-full h-full p-4">
     <slot name="content" />
   </main>
 </template>

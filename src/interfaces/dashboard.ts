@@ -11,3 +11,15 @@ export interface CreateDashboardResponse {
     updatedAt: Date;
   };
 }
+
+export interface Dashboard {
+  id: number;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface GetUserDashboardsResponse {
+  ok: boolean;
+  data: Dashboard[];
+}

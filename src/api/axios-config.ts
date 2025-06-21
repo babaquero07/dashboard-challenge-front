@@ -2,7 +2,7 @@ import axios, {
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from "axios";
-import { clearAuthData } from "./navigation";
+import { clearAuthData, navigateToLogin } from "./navigation";
 
 export const dashboardApi = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -43,6 +43,7 @@ dashboardApi.interceptors.response.use(
       switch (response.status) {
         case 401:
           clearAuthData();
+          navigateToLogin();
           break;
 
         default:

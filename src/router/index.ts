@@ -7,6 +7,7 @@ import LoginView from "../ui/views/LoginView.vue";
 import { useAuthStore } from "../stores/auth";
 import RegisterView from "../ui/views/RegisterView.vue";
 import Dashboard from "../ui/pages/Dashboard.vue";
+import CreateDashboardView from "../ui/views/CreateDashboardView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -33,6 +34,14 @@ const routes: Array<RouteRecordRaw> = [
     path: "/dashboard",
     name: "Dashboard",
     component: Dashboard,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/dashboard/new",
+    name: "CreateDashboard",
+    component: CreateDashboardView,
     meta: {
       requiresAuth: true,
     },

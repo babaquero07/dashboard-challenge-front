@@ -10,7 +10,7 @@ defineProps<{
   <div
     class="flex flex-col gap-2 p-4 bg-white rounded-md shadow-md w-full h-full"
   >
-    <h3 class="text-sm font-medium text-gray-500">{{ title }}</h3>
+    <h3 class="font-medium text-indigo-600 capitalize">{{ title }}</h3>
     <p class="text-2xl font-bold text-gray-900">
       ${{ value.toLocaleString() }}
     </p>

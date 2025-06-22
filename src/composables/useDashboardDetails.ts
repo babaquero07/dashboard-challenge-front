@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import type {
+  DashboardComponentData,
   DashboardWithComponents,
   WidgetType,
 } from "../interfaces/dashboard";
@@ -9,6 +10,7 @@ export const useDashboardDetails = () => {
   const isLoading = ref(false);
   const error = ref("");
   const dashboard = ref<DashboardWithComponents | null>(null);
+  const updateDashboard = ref<boolean>(false);
   const widgets = ref<
     | {
         id: number;
@@ -64,9 +66,49 @@ export const useDashboardDetails = () => {
           },
         }));
         widgets.value = components;
+        updateDashboard.value = true;
       } else {
+        updateDashboard.value = false;
         await getWidgetTypes();
       }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  const createDashboardComponents = async (
+    dashboardId: number,
+    components: DashboardComponentData[]
+  ) => {
+    try {
+      isLoading.value = true;
+      const res = await dashboardsServices.createDashboardComponents(
+        dashboardId,
+        components
+      );
+
+      return res;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  const updateDashboardComponents = async (
+    dashboardId: number,
+    components: DashboardComponentData[]
+  ) => {
+    try {
+      isLoading.value = true;
+      const res = await dashboardsServices.updateDashboardComponents(
+        dashboardId,
+        components
+      );
+
+      return res;
     } catch (error) {
       console.log(error);
     } finally {
@@ -78,8 +120,11 @@ export const useDashboardDetails = () => {
     isLoading,
     error,
     dashboard,
+    updateDashboard,
     widgets,
     getDashboard,
     getWidgetTypes,
+    createDashboardComponents,
+    updateDashboardComponents,
   };
 };

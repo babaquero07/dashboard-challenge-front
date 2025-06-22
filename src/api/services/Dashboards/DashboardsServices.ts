@@ -1,8 +1,11 @@
 import type {
+  CreateDashboardComponentsResponse,
   CreateDashboardResponse,
+  DashboardComponentData,
   GetDashboardResponse,
   GetUserDashboardsResponse,
   GetWidgetTypeResponse,
+  UpdateDashboardComponentsResponse,
 } from "../../../interfaces/dashboard";
 import { dashboardApi } from "../../axios-config";
 
@@ -61,6 +64,48 @@ export class DashboardsServices {
       const response = await dashboardApi.get<GetWidgetTypeResponse>(
         "/dashboards/widget-types"
       );
+
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+
+      throw new Error("Error de conexión. Intente nuevamente.");
+    }
+  }
+
+  async createDashboardComponents(
+    dashboardId: number,
+    components: DashboardComponentData[]
+  ): Promise<CreateDashboardComponentsResponse> {
+    try {
+      const response =
+        await dashboardApi.post<CreateDashboardComponentsResponse>(
+          `/dashboards/${dashboardId}/components`,
+          components
+        );
+
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+
+      throw new Error("Error de conexión. Intente nuevamente.");
+    }
+  }
+
+  async updateDashboardComponents(
+    dashboardId: number,
+    components: DashboardComponentData[]
+  ): Promise<UpdateDashboardComponentsResponse> {
+    try {
+      const response =
+        await dashboardApi.patch<UpdateDashboardComponentsResponse>(
+          `/dashboards/${dashboardId}/components`,
+          components
+        );
 
       return response.data;
     } catch (error: any) {

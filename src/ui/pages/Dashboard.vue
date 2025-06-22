@@ -10,7 +10,6 @@ import Loader from "../atoms/Loader.vue";
 
 const isLoading = ref(false);
 const dashboards = ref<Dashboard[]>([]);
-console.log("🚀 ~ dashboards:", dashboards);
 
 const router = useRouter();
 

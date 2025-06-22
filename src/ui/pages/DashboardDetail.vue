@@ -76,7 +76,6 @@ watch(
   widgets,
   (newWidgets) => {
     if (newWidgets && newWidgets.length > 0 && !grid.value) {
-      console.log("🚀 ~ newWidgets:", newWidgets);
       initGridStack();
     }
   },

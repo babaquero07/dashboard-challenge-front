@@ -30,7 +30,6 @@ const {
   createDashboardComponents,
   updateDashboardComponents,
 } = useDashboardDetails();
-console.log({ updateDashboard: updateDashboard.value });
 
 const makeWidget = (widget: {
   id: number;
@@ -76,6 +75,7 @@ watch(
   widgets,
   (newWidgets) => {
     if (newWidgets && newWidgets.length > 0 && !grid.value) {
+      console.log("🚀 ~ newWidgets:", newWidgets);
       initGridStack();
     }
   },

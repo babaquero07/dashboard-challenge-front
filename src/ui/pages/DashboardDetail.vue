@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import DashboardLayout from "../layouts/DashboardLayout.vue";
 import Loader from "../atoms/Loader.vue";
@@ -59,16 +59,21 @@ const initGridStack = () => {
     return;
   }
 
-  grid.value = GridStack.init({
-    column: 3,
-    cellHeight: 150,
-    minRow: 1,
-    margin: 10,
-    disableDrag: !isEditing.value,
-    disableResize: !isEditing.value,
-  });
+  // ensure DOM is rendered before initializing GridStack
+  nextTick(() => {
+    grid.value = GridStack.init({
+      column: 3,
+      cellHeight: 150,
+      minRow: 1,
+      margin: 10,
+      disableDrag: !isEditing.value,
+      disableResize: !isEditing.value,
+    });
 
-  makeWidgets(widgets.value);
+    if (widgets.value) {
+      makeWidgets(widgets.value);
+    }
+  });
 };
 
 // Watch for changes in widgets and initialize GridStack when data is available
@@ -79,13 +84,12 @@ watch(
       initGridStack();
     }
   },
-  { immediate: true }
+  { immediate: false }
 );
 
 onMounted(async () => {
   await getDashboard(dashboardId);
 
-  // If widgets are already loaded after getDashboard, initialize GridStack
   if (widgets.value && widgets.value.length > 0) {
     initGridStack();
   }
@@ -101,37 +105,48 @@ const toggleEditing = () => {
   isEditing.value = !isEditing.value;
 };
 const getComponentsData = () => {
-  // Obtener las posiciones actuales de GridStack
   const gridItems = grid.value?.getGridItems() || [];
 
-  const componentsData = gridItems.map((item) => {
-    const widgetId = parseInt(item.getAttribute("gs-id") || "0");
-    const widget = widgets.value?.find((w) => w.id === widgetId);
+  const componentsData = gridItems
+    .map((item) => {
+      const widgetId = parseInt(item.getAttribute("gs-id") || "0");
+      const widget = widgets.value?.find((w) => w.id === widgetId);
 
-    if (!widget) return;
+      if (!widget) return;
 
-    return {
-      title: widget.title,
-      width: item.getAttribute("gs-w")
-        ? parseInt(item.getAttribute("gs-w")!)
-        : widget.grid.w,
-      height: item.getAttribute("gs-h")
-        ? parseInt(item.getAttribute("gs-h")!)
-        : widget.grid.h,
-      x: item.getAttribute("gs-x")
-        ? parseInt(item.getAttribute("gs-x")!)
-        : widget.grid.x,
-      y: item.getAttribute("gs-y")
-        ? parseInt(item.getAttribute("gs-y")!)
-        : widget.grid.y,
-      widgetTypeId: widget.id,
-    };
-  });
+      const gridItem = grid.value
+        ?.getGridItems()
+        .find((gi) => gi.getAttribute("gs-id") === widgetId.toString());
+
+      if (!gridItem) return;
+
+      return {
+        title: widget.title,
+        width: gridItem.getAttribute("gs-w")
+          ? parseInt(gridItem.getAttribute("gs-w")!)
+          : widget.grid.w,
+        height: gridItem.getAttribute("gs-h")
+          ? parseInt(gridItem.getAttribute("gs-h")!)
+          : widget.grid.h,
+        x: gridItem.getAttribute("gs-x")
+          ? parseInt(gridItem.getAttribute("gs-x")!)
+          : widget.grid.x,
+        y: gridItem.getAttribute("gs-y")
+          ? parseInt(gridItem.getAttribute("gs-y")!)
+          : widget.grid.y,
+        widgetTypeId: widget.id,
+      };
+    })
+    .filter(Boolean);
 
   return componentsData;
 };
 
 const saveChanges = async () => {
+  if (grid.value) {
+    grid.value.compact();
+  }
+
   const componentsData = getComponentsData();
   if (componentsData.length === 0) return;
 

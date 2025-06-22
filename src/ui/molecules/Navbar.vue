@@ -18,7 +18,7 @@ const handleLogout = () => {
         <RouterLink to="/dashboard">
           <span
             class="text-[20px] font-bold text-gray-800 hover:text-indigo-700"
-            >Dashboard</span
+            >Dashboard Challenge 👨🏻‍💻</span
           >
         </RouterLink>
       </li>

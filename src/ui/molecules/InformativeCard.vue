@@ -8,7 +8,7 @@ defineProps<{
 
 <template>
   <div
-    class="flex flex-col gap-2 p-4 bg-white rounded-md shadow-md w-full h-full"
+    class="flex flex-col gap-2 p-4 bg-white rounded-md shadow-md w-full h-full min-h-[150px]"
   >
     <h3 class="font-medium text-indigo-600 capitalize">{{ title }}</h3>
     <p class="text-2xl font-bold text-gray-900">

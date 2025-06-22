@@ -10,6 +10,7 @@ import Loader from "../atoms/Loader.vue";
 
 const isLoading = ref(false);
 const dashboards = ref<Dashboard[]>([]);
+console.log("🚀 ~ dashboards:", dashboards);
 
 const router = useRouter();
 
@@ -43,17 +44,19 @@ onMounted(() => {
         <Loader />
       </div>
 
-      <div v-else-if="!isLoading && dashboards.length > 0">
-        <DashboardList listTitle="Tus dashboards" :dashboards="dashboards" />
+      <div v-else="!isLoading">
+        <DashboardList
+          v-if="dashboards.length > 0"
+          listTitle="Tus dashboards"
+          :dashboards="dashboards"
+        />
 
-        <div
-          v-if="!isLoading && dashboards.length === 0"
-          class="flex flex-col mb-4"
-        >
-          <h1 class="text-2xl font-bold text-red-500">
+        <div v-else class="flex flex-col mb-4">
+          <h1 class="text-2xl font-bold text-red-400">
             No tienes dashboards creados
           </h1>
         </div>
+
         <Button
           label="Crear dashboard"
           size="md"

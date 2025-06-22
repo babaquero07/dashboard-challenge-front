@@ -4,8 +4,7 @@ import DashboardCard from "../atoms/DashboardCard.vue";
 import type { Dashboard } from "../../interfaces/dashboard";
 
 const router = useRouter();
-
-const props = defineProps<{
+defineProps<{
   listTitle?: string;
   dashboards: Dashboard[];
 }>();

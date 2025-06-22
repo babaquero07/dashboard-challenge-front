@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import DashboardLayout from "../layouts/DashboardLayout.vue";
 import Loader from "../atoms/Loader.vue";
 import { useDashboardDetails } from "../../composables/useDashboardDetails";
@@ -10,15 +10,27 @@ import Button from "../atoms/Button.vue";
 import InformativeCard from "../molecules/InformativeCard.vue";
 import BestSellingComponentsList from "../molecules/BestSellingComponentsList.vue";
 import SalesByMonthChart from "../organisms/SalesByMonthChart.vue";
+import type { DashboardComponentData } from "../../interfaces/dashboard";
 
 const grid = ref<GridStack | null>(null);
 const isEditing = ref(false);
 
+const router = useRouter();
+
 const route = useRoute();
 const dashboardId = route.params.id as string;
 
-const { isLoading, error, dashboard, widgets, getDashboard } =
-  useDashboardDetails();
+const {
+  isLoading,
+  error,
+  dashboard,
+  updateDashboard,
+  widgets,
+  getDashboard,
+  createDashboardComponents,
+  updateDashboardComponents,
+} = useDashboardDetails();
+console.log({ updateDashboard: updateDashboard.value });
 
 const makeWidget = (widget: {
   id: number;
@@ -70,6 +82,15 @@ watch(
   { immediate: true }
 );
 
+onMounted(async () => {
+  await getDashboard(dashboardId);
+
+  // If widgets are already loaded after getDashboard, initialize GridStack
+  if (widgets.value && widgets.value.length > 0) {
+    initGridStack();
+  }
+});
+
 const toggleEditing = () => {
   if (isEditing.value) {
     grid.value?.disable();
@@ -78,6 +99,62 @@ const toggleEditing = () => {
   }
 
   isEditing.value = !isEditing.value;
+};
+const getComponentsData = () => {
+  // Obtener las posiciones actuales de GridStack
+  const gridItems = grid.value?.getGridItems() || [];
+
+  const componentsData = gridItems.map((item) => {
+    const widgetId = parseInt(item.getAttribute("gs-id") || "0");
+    const widget = widgets.value?.find((w) => w.id === widgetId);
+
+    if (!widget) return;
+
+    return {
+      title: widget.title,
+      width: item.getAttribute("gs-w")
+        ? parseInt(item.getAttribute("gs-w")!)
+        : widget.grid.w,
+      height: item.getAttribute("gs-h")
+        ? parseInt(item.getAttribute("gs-h")!)
+        : widget.grid.h,
+      x: item.getAttribute("gs-x")
+        ? parseInt(item.getAttribute("gs-x")!)
+        : widget.grid.x,
+      y: item.getAttribute("gs-y")
+        ? parseInt(item.getAttribute("gs-y")!)
+        : widget.grid.y,
+      widgetTypeId: widget.id,
+    };
+  });
+
+  return componentsData;
+};
+
+const saveChanges = async () => {
+  const componentsData = getComponentsData();
+  if (componentsData.length === 0) return;
+
+  let res = null;
+
+  if (updateDashboard.value) {
+    res = await updateDashboardComponents(
+      +dashboardId,
+      componentsData as DashboardComponentData[]
+    );
+  } else {
+    res = await createDashboardComponents(
+      +dashboardId,
+      componentsData as DashboardComponentData[]
+    );
+  }
+
+  if (res?.ok) {
+    alert("Cambios guardados correctamente");
+    router.push("/dashboard");
+  } else {
+    alert("Error al guardar los cambios");
+  }
 };
 
 const getWidgetComponent = (widgetId: number) => {
@@ -107,46 +184,6 @@ const getWidgetProps = (widget: any) => {
       return {};
   }
 };
-
-const saveChanges = () => {
-  // Obtener las posiciones actuales de GridStack
-  const gridItems = grid.value?.getGridItems() || [];
-
-  gridItems.forEach((item) => {
-    const widgetId = parseInt(item.getAttribute("gs-id") || "0");
-    const widget = widgets.value?.find((w) => w.id === widgetId);
-
-    if (!widget) return;
-
-    const componentData = {
-      title: widget.title,
-      width: item.getAttribute("gs-w")
-        ? parseInt(item.getAttribute("gs-w")!)
-        : widget.grid.w,
-      height: item.getAttribute("gs-h")
-        ? parseInt(item.getAttribute("gs-h")!)
-        : widget.grid.h,
-      x: item.getAttribute("gs-x")
-        ? parseInt(item.getAttribute("gs-x")!)
-        : widget.grid.x,
-      y: item.getAttribute("gs-y")
-        ? parseInt(item.getAttribute("gs-y")!)
-        : widget.grid.y,
-      widgetTypeId: widget.id,
-    };
-
-    console.log(componentData);
-  });
-};
-
-onMounted(async () => {
-  await getDashboard(dashboardId);
-
-  // If widgets are already loaded after getDashboard, initialize GridStack
-  if (widgets.value && widgets.value.length > 0) {
-    initGridStack();
-  }
-});
 </script>
 
 <template>

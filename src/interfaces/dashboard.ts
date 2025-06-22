@@ -36,6 +36,19 @@ export interface DashboardComponent {
   updatedAt: Date;
 }
 
+export interface DashboardComponentData
+  extends Omit<DashboardComponent, "widgetType" | "createdAt" | "updatedAt"> {
+  widgetTypeId: number;
+}
+
+export interface CreateDashboardComponentsResponse {
+  ok: boolean;
+  message: string;
+}
+
+export interface UpdateDashboardComponentsResponse
+  extends CreateDashboardComponentsResponse {}
+
 export interface WidgetType {
   id: number;
   name: string;

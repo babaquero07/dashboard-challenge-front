@@ -44,13 +44,16 @@ export interface WidgetType {
   updatedAt: Date;
 }
 
+export interface DashboardWithComponents extends Dashboard {
+  dashboardComponents: DashboardComponent[];
+}
+
 export interface GetDashboardResponse {
   ok: boolean;
-  data: {
-    id: number;
-    name: string;
-    createdAt: Date;
-    updatedAt: Date;
-    dashboardComponents: DashboardComponent[];
-  };
+  data: DashboardWithComponents;
+}
+
+export interface GetWidgetTypeResponse {
+  ok: boolean;
+  data: WidgetType[];
 }

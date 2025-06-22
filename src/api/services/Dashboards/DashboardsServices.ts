@@ -2,6 +2,7 @@ import type {
   CreateDashboardResponse,
   GetDashboardResponse,
   GetUserDashboardsResponse,
+  GetWidgetTypeResponse,
 } from "../../../interfaces/dashboard";
 import { dashboardApi } from "../../axios-config";
 
@@ -43,6 +44,22 @@ export class DashboardsServices {
     try {
       const response = await dashboardApi.get<GetDashboardResponse>(
         `/dashboards/${dashboardId}`
+      );
+
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+
+      throw new Error("Error de conexión. Intente nuevamente.");
+    }
+  }
+
+  async getWidgetTypes(): Promise<GetWidgetTypeResponse> {
+    try {
+      const response = await dashboardApi.get<GetWidgetTypeResponse>(
+        "/dashboards/widget-types"
       );
 
       return response.data;

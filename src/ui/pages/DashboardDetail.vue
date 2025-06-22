@@ -30,6 +30,7 @@ const {
   createDashboardComponents,
   updateDashboardComponents,
 } = useDashboardDetails();
+console.log("🚀 ~ error:", error);
 
 const makeWidget = (widget: {
   id: number;
